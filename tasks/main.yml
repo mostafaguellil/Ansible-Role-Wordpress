@@ -1,6 +1,4 @@
 ---
-# roles/wordpress/tasks/main.yml
-
 - name: Debug OS family
   ansible.builtin.debug:
     var: ansible_os_family
@@ -39,6 +37,15 @@
     path: "{{ wordpress_dir }}/index.html"
     state: absent
 
+# ✅ Définir les variables de propriété des fichiers
+- name: Define WordPress file ownership
+  set_fact:
+    wp_owner: "www-data"
+    wp_group: "www-data"
+    wp_file_mode: "0644"
+    wp_dir_mode: "0755"
+    wp_config_mode: "0640"
+
 - name: Collect service facts
   ansible.builtin.service_facts:
 
@@ -76,19 +83,20 @@
   ansible.builtin.pause:
     seconds: 10
 
-# --- WordPress installation ---
-- name: Download WordPress archive
+# ✅ Télécharger et décompresser WordPress
+- name: Download WordPress
   ansible.builtin.get_url:
     url: "{{ wordpress_url }}"
     dest: /tmp/wordpress.zip
     mode: '0644'
 
-- name: Unarchive WordPress
+- name: Unzip WordPress archive
   ansible.builtin.unarchive:
     src: /tmp/wordpress.zip
     dest: /tmp
     remote_src: yes
 
+# ✅ Copier les fichiers WordPress dans le répertoire web
 - name: Copy WordPress files to web root
   ansible.builtin.copy:
     src: /tmp/wordpress/
@@ -98,18 +106,11 @@
     mode: "{{ wp_dir_mode }}"
     remote_src: yes
 
-- name: Create wp-config.php from template
+# ✅ Créer wp-config.php
+- name: Create wp-config.php
   ansible.builtin.template:
     src: wp-config.php.j2
     dest: "{{ wordpress_dir }}/wp-config.php"
     owner: "{{ wp_owner }}"
     group: "{{ wp_group }}"
     mode: "{{ wp_config_mode }}"
-
-- name: Ensure correct permissions on WordPress files
-  ansible.builtin.file:
-    path: "{{ wordpress_dir }}"
-    owner: "{{ wp_owner }}"
-    group: "{{ wp_group }}"
-    recurse: yes
-    mode: "{{ wp_file_mode }}"
