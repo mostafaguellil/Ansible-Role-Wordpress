@@ -1,0 +1,10 @@
+---
+wordpress_db_name: wordpress
+wordpress_db_user: example
+wordpress_db_password: password
+wordpress_root_password: password
+wordpress_url: https://wordpress.org/latest.zip
+wordpress_dir: /var/www/html
+
+
+

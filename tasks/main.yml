@@ -1,0 +1,56 @@
+---
+- name: Update apt/dnf cache
+  ansible.builtin.package:
+    update_cache: yes
+
+- name: Install required packages (Ubuntu)
+  ansible.builtin.apt:
+    name:
+      - apache2
+      - php
+      - libapache2-mod-php
+      - php-mysql
+      - mariadb-server
+      - wget
+      - unzip
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages (Rocky)
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - php
+      - php-mysqlnd
+      - mariadb-server
+      - wget
+      - unzip
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Remove default index.html
+  ansible.builtin.file:
+    path: "{{ wordpress_dir }}/index.html"
+    state: absent
+
+- name: Start Apache
+  ansible.builtin.shell: |
+    service apache2 start
+  when: ansible_os_family == "Debian"
+  notify: restart apache
+
+- name: Start Apache (Rocky)
+  ansible.builtin.shell: |
+    /usr/sbin/httpd -DFOREGROUND &
+  when: ansible_os_family == "RedHat"
+  notify: restart apache
+
+- name: Start MariaDB
+  ansible.builtin.shell: |
+    mysqld_safe --datadir=/var/lib/mysql &
+  async: 0
+  poll: 0
+
+- name: Wait for MariaDB to start
+  ansible.builtin.pause:
+    seconds: 10
