@@ -1,6 +1,0 @@
----
-# handlers/main.yml
-- name: Restart Apache
-  ansible.builtin.service:
-    name: "{{ apache_service_name_debian if ansible_os_family == 'Debian' else apache_service_name_redhat }}"
-    state: restarted
