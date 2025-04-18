@@ -38,7 +38,7 @@
     state: absent
 
 - name: Define WordPress file ownership
-  ansible.builtin.set_fact:
+  set_fact:
     wp_owner: "www-data"
     wp_group: "www-data"
     wp_file_mode: "0644"
@@ -61,9 +61,7 @@
     name: httpd
     state: started
     enabled: true
-  when:
-    - ansible_os_family in ["RedHat", "Rocky"]
-    - 'httpd' in ansible_facts.services
+  when: ansible_os_family in ["RedHat", "Rocky"]
   notify: Restart Apache
 
 - name: Start MariaDB (Ubuntu)
@@ -105,18 +103,10 @@
     mode: "{{ wp_dir_mode }}"
     remote_src: yes
 
-- name: Create wp-config.php from template
+- name: Create wp-config.php
   ansible.builtin.template:
     src: wp-config.php.j2
     dest: "{{ wordpress_dir }}/wp-config.php"
     owner: "{{ wp_owner }}"
     group: "{{ wp_group }}"
     mode: "{{ wp_config_mode }}"
-
-- name: Ensure correct permissions on WordPress files
-  ansible.builtin.file:
-    path: "{{ wordpress_dir }}"
-    owner: "{{ wp_owner }}"
-    group: "{{ wp_group }}"
-    recurse: yes
-    mode: "{{ wp_file_mode }}"
