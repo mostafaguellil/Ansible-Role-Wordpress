@@ -40,23 +40,5 @@ This will:
     state: restarted
 ```
 
-## Testing
-
-You can test locally in containers:
-
-```bash
-# Ubuntu
-docker run -it --rm ubuntu:22.04 bash -c "\
-  apt update && apt install -y python3 python3-pip && \
-  pip3 install ansible && \
-  ansible-playbook -i localhost, --connection=local deploy_wordpress.yml"
-
-# Rocky Linux
-docker run -it --rm rockylinux:9 bash -c "\
-  dnf install -y python3 python3-pip && \
-  pip3 install ansible && \
-  ansible-playbook -i localhost, --connection=local deploy_wordpress.yml"
-```
-
 ## Author
 Mostafa GUELLIL
