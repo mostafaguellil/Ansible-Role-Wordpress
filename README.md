@@ -14,7 +14,7 @@ Create a playbook `deploy_wordpress.yml` in your project root:
   become: yes
 
   roles:
-    - wordpress
+    - mostafaguellil.wordpress
 ```
 
 ## Usage
