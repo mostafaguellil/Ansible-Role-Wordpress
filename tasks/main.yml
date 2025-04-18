@@ -33,23 +33,39 @@
     path: "{{ wordpress_dir }}/index.html"
     state: absent
 
-- name: Start Apache
-  ansible.builtin.shell: |
-    service apache2 start
+# ✅ Démarrage Apache propre
+
+- name: Start Apache (Ubuntu)
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: true
   when: ansible_os_family == "Debian"
-  notify: restart apache
+  notify: Restart Apache
 
 - name: Start Apache (Rocky)
-  ansible.builtin.shell: |
-    /usr/sbin/httpd -DFOREGROUND &
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
   when: ansible_os_family == "RedHat"
-  notify: restart apache
+  notify: Restart Apache
 
-- name: Start MariaDB
-  ansible.builtin.shell: |
-    mysqld_safe --datadir=/var/lib/mysql &
-  async: 0
-  poll: 0
+# ✅ Démarrage MariaDB propre
+
+- name: Start MariaDB (Ubuntu)
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+
+- name: Start MariaDB (Rocky)
+  ansible.builtin.service:
+    name: mariadb
+    state: started
+    enabled: true
+  when: ansible_os_family == "RedHat"
 
 - name: Wait for MariaDB to start
   ansible.builtin.pause:
