@@ -33,7 +33,8 @@
     path: "{{ wordpress_dir }}/index.html"
     state: absent
 
-# ✅ Démarrage Apache propre
+- name: Collect service facts
+  ansible.builtin.service_facts:
 
 - name: Start Apache (Ubuntu)
   ansible.builtin.service:
@@ -50,8 +51,6 @@
     enabled: true
   when: ansible_os_family == "RedHat"
   notify: Restart Apache
-
-# ✅ Démarrage MariaDB propre
 
 - name: Start MariaDB (Ubuntu)
   ansible.builtin.service:
