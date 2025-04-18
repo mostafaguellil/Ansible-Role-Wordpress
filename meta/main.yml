@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  namespace: wordpress
+  namespace: mostafaguellil
   role_name: wordpress
   author: mostafaguellil
   description: "Déploiement automatisé de WordPress avec MariaDB sur Ubuntu et Rocky Linux"
