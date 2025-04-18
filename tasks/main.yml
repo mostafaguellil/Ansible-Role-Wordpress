@@ -1,4 +1,6 @@
 ---
+# roles/wordpress/tasks/main.yml
+
 - name: Debug OS family
   ansible.builtin.debug:
     var: ansible_os_family
@@ -73,3 +75,41 @@
 - name: Wait for MariaDB to start
   ansible.builtin.pause:
     seconds: 10
+
+# --- WordPress installation ---
+- name: Download WordPress archive
+  ansible.builtin.get_url:
+    url: "{{ wordpress_url }}"
+    dest: /tmp/wordpress.zip
+    mode: '0644'
+
+- name: Unarchive WordPress
+  ansible.builtin.unarchive:
+    src: /tmp/wordpress.zip
+    dest: /tmp
+    remote_src: yes
+
+- name: Copy WordPress files to web root
+  ansible.builtin.copy:
+    src: /tmp/wordpress/
+    dest: "{{ wordpress_dir }}"
+    owner: "{{ wp_owner }}"
+    group: "{{ wp_group }}"
+    mode: "{{ wp_dir_mode }}"
+    remote_src: yes
+
+- name: Create wp-config.php from template
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: "{{ wordpress_dir }}/wp-config.php"
+    owner: "{{ wp_owner }}"
+    group: "{{ wp_group }}"
+    mode: "{{ wp_config_mode }}"
+
+- name: Ensure correct permissions on WordPress files
+  ansible.builtin.file:
+    path: "{{ wordpress_dir }}"
+    owner: "{{ wp_owner }}"
+    group: "{{ wp_group }}"
+    recurse: yes
+    mode: "{{ wp_file_mode }}"
